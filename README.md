@@ -6,9 +6,8 @@
 - Spring Boot 3
 - PostgreSQL
 - Spring Security
-- JWT
-- Eureka Server
-- API Gateway
+- Spring Cloud Gateway
+- Eureka
 - OpenFeign
 - Docker
 
@@ -18,7 +17,4 @@
 - API Gateway
 - Auth Service
 - Product Service
-- Cart Service
-- Inventory Service
 - Order Service
-- Payment Service
