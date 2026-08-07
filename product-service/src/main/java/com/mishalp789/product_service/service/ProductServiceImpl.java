@@ -1,48 +1,73 @@
 package com.mishalp789.product_service.service;
 
+import com.mishalp789.product_service.dto.ProductRequest;
+import com.mishalp789.product_service.dto.ProductResponse;
 import com.mishalp789.product_service.entity.Product;
+import com.mishalp789.product_service.exception.ProductNotFoundException;
+import com.mishalp789.product_service.mapper.ProductMapper;
 import com.mishalp789.product_service.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService{
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAllProducts() {
+
+        List<Product> products= productRepository.findAll();
+        return products.stream()
+                .map(productMapper::toResponse)
+                .toList();
     }
 
     @Override
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public ProductResponse getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(()-> new ProductNotFoundException(id));
+
+        return productMapper.toResponse(product);
+    }
+    @Transactional
+    @Override
+    public ProductResponse createProduct(ProductRequest request) {
+        Product product = productMapper.toEntity(request);
+
+        Product saved = productRepository.save(product);
+        return productMapper.toResponse(saved);
     }
 
+    @Transactional
     @Override
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
-    }
-
-    @Override
-    public Product updateProduct(Long id, Product product) {
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("product not found"));
-        existingProduct.setName(product.getName());
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setQuantity(product.getQuantity());
-        return productRepository.save(existingProduct);
+                .orElseThrow(()-> new ProductNotFoundException(id));
+
+        productMapper.updateEntity(existingProduct,request);
+        Product saved = productRepository.save(existingProduct);
+
+        return productMapper.toResponse(saved);
+
 
     }
 
+    @Transactional
     @Override
-    public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+    public String deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        productRepository.delete(product);
+
+        return "Product deleted successfully";
     }
+
+
 }

@@ -1,14 +1,16 @@
 package com.mishalp789.product_service.service;
 
+import com.mishalp789.product_service.dto.ProductRequest;
+import com.mishalp789.product_service.dto.ProductResponse;
 import com.mishalp789.product_service.entity.Product;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
-    List<Product> getAllProducts();
-    Optional<Product> getProductById(Long id);
-    Product createProduct(Product product);
-    Product updateProduct(Long id,Product product);
-    void deleteProduct(Long id);
+    List<ProductResponse> getAllProducts();
+    ProductResponse getProductById(Long id);
+    ProductResponse createProduct(ProductRequest request);
+    ProductResponse updateProduct(Long id,ProductRequest request);
+    String deleteProduct(Long id);
 }

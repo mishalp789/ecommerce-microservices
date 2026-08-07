@@ -1,7 +1,10 @@
 package com.mishalp789.product_service;
 
+import com.mishalp789.product_service.dto.ProductRequest;
+import com.mishalp789.product_service.dto.ProductResponse;
 import com.mishalp789.product_service.entity.Product;
 import com.mishalp789.product_service.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,27 +19,27 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product){
-        return productService.createProduct(product);
+    public ProductResponse createProduct(@Valid @RequestBody ProductRequest request){
+        return productService.createProduct(request);
     }
     @GetMapping
-    public List<Product> getAllProducts(){
+    public List<ProductResponse> getAllProducts(){
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public Optional<Product> getProductById(@PathVariable Long id){
+    public ProductResponse getProductById(@PathVariable Long id){
         return productService.getProductById(id);
     }
 
     @PutMapping("/{id}")
-    public Product updateProductById(@PathVariable Long id,@RequestBody Product product){
-        return productService.updateProduct(id,product);
+    public ProductResponse updateProductById(@PathVariable Long id,@RequestBody ProductRequest request){
+        return productService.updateProduct(id,request);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProductById(@PathVariable Long id){
-        productService.deleteProduct(id);
+    public String deleteProductById(@PathVariable Long id){
+        return productService.deleteProduct(id);
     }
 
 

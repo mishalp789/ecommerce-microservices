@@ -1,7 +1,5 @@
-package com.mishalp789.product_service.entity;
+package com.mishalp789.product_service.dto;
 
-import com.mishalp789.product_service.dto.ProductRequest;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,31 +8,23 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "products")
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ProductRequest {
 
     @NotBlank(message = "Product name is required")
     private String name;
 
-    @NotBlank(message = "Descriptio is required")
+    @NotBlank(message = "Description is required")
     private String description;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Price is required")
+    @Positive(message = "Price must be greater than zero")
     private BigDecimal price;
 
-    @PositiveOrZero
+    @NotNull(message = "Quantity is required")
+    @PositiveOrZero(message = "Quantity cannot be negative")
     private Integer quantity;
-
-
 }
