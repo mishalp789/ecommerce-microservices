@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/products/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/products/*/decrease-stock").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/products/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/products/**").authenticated()
                         .anyRequest().authenticated()

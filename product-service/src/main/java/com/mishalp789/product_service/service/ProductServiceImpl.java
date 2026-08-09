@@ -3,6 +3,7 @@ package com.mishalp789.product_service.service;
 import com.mishalp789.product_service.dto.ProductRequest;
 import com.mishalp789.product_service.dto.ProductResponse;
 import com.mishalp789.product_service.entity.Product;
+import com.mishalp789.product_service.exception.InsufficientStockException;
 import com.mishalp789.product_service.exception.ProductNotFoundException;
 import com.mishalp789.product_service.mapper.ProductMapper;
 import com.mishalp789.product_service.repository.ProductRepository;
@@ -67,6 +68,23 @@ public class ProductServiceImpl implements ProductService{
         productRepository.delete(product);
 
         return "Product deleted successfully";
+    }
+
+    @Override
+    @Transactional
+    public ProductResponse decreaseStock(Long id, Integer quantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(()-> new ProductNotFoundException(id));
+
+        if(product.getQuantity()<quantity){
+            throw new InsufficientStockException();
+        }
+
+        product.setQuantity(product.getQuantity()-quantity);
+
+        Product saved = productRepository.save(product);
+
+        return productMapper.toResponse(saved);
     }
 
 

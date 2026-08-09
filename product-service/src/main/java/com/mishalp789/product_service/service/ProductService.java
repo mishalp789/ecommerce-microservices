@@ -13,4 +13,5 @@ public interface ProductService {
     ProductResponse createProduct(ProductRequest request);
     ProductResponse updateProduct(Long id,ProductRequest request);
     String deleteProduct(Long id);
+    ProductResponse decreaseStock(Long id,Integer quantity);
 }
