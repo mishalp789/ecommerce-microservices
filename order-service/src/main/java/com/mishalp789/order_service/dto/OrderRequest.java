@@ -13,9 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest {
-    @NotNull
+    @NotNull(message = "Product ID is required")
+    @Positive(message = "Product ID must be greater than 0")
     private Long productId;
 
-    @Positive
+    @NotNull(message = "Quantity is required")
+    @Positive(message = "Quantity must be greater than 0")
     private Integer quantity;
 }

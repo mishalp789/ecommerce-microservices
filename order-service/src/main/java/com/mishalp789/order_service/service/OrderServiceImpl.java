@@ -49,8 +49,7 @@ public class OrderServiceImpl implements OrderService {
             return orderMapper.toResponse(orderRepository.save(order));
 
         } catch (Exception ex) {
-            throw new ProductServiceException(
-                    "Unable to create order: " + ex.getMessage());
+            throw new ProductServiceException("Insufficient stock for product id: " + request.getProductId());
         }
     }
 
