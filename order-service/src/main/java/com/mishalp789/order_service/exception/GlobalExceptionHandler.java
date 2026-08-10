@@ -17,13 +17,14 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProductServiceException.class)
-    public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceException ex) {
+    public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceException ex,HttpServletRequest request) {
 
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.SERVICE_UNAVAILABLE.value())
                 .error("Product Service Unavailable")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
                 .build();
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
