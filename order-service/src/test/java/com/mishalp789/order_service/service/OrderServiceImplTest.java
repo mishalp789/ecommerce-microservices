@@ -99,15 +99,17 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    void shouldThrowProductServiceExceptionWhenProductClientFails() {
+    void shouldThrowExceptionWhenGetProductFails() {
 
         when(productClient.getProduct(1L))
                 .thenThrow(new RuntimeException("Service unavailable"));
 
-        assertThrows(
-                ProductServiceException.class,
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
                 () -> service.createOrder(request)
         );
+
+        assertEquals("Service unavailable", exception.getMessage());
 
         verify(productClient).getProduct(1L);
         verify(orderRepository, never()).save(any());
@@ -119,14 +121,15 @@ public class OrderServiceImplTest {
         when(productClient.getProduct(1L))
                 .thenReturn(productResponse);
 
-        doThrow(new RuntimeException("Insufficient stock"))
-                .when(productClient)
-                .decreaseStock(1L, 2);
+        when(productClient.decreaseStock(1L, 2))
+                .thenThrow(new RuntimeException("Insufficient stock"));
 
-        assertThrows(
-                ProductServiceException.class,
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
                 () -> service.createOrder(request)
         );
+
+        assertEquals("Insufficient stock", exception.getMessage());
 
         verify(productClient).getProduct(1L);
         verify(productClient).decreaseStock(1L, 2);

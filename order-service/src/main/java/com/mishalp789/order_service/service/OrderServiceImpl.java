@@ -9,6 +9,7 @@ import com.mishalp789.order_service.entity.OrderStatus;
 import com.mishalp789.order_service.exception.ProductServiceException;
 import com.mishalp789.order_service.mapper.OrderMapper;
 import com.mishalp789.order_service.repository.OrderRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,34 +24,35 @@ public class OrderServiceImpl implements OrderService {
     private final ProductClient productClient;
     private final OrderMapper orderMapper;
 
-
+    @CircuitBreaker(
+            name = "productService",
+            fallbackMethod = "createOrderFallback")
     @Override
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
-        try {
 
-            ProductResponse product =
-                    productClient.getProduct(request.getProductId());
+        ProductResponse product =
+                productClient.getProduct(request.getProductId());
 
-            productClient.decreaseStock(
-                    request.getProductId(),
-                    request.getQuantity());
+        productClient.decreaseStock(
+                request.getProductId(),
+                request.getQuantity());
 
-            BigDecimal total = product.getPrice()
-                    .multiply(BigDecimal.valueOf(request.getQuantity()));
+        BigDecimal total =
+                product.getPrice()
+                        .multiply(BigDecimal.valueOf(request.getQuantity()));
 
-            Order order = Order.builder()
-                    .productId(product.getId())
-                    .quantity(request.getQuantity())
-                    .totalPrice(total)
-                    .status(OrderStatus.CONFIRMED)
-                    .build();
+        Order order = Order.builder()
+                .productId(product.getId())
+                .quantity(request.getQuantity())
+                .totalPrice(total)
+                .status(OrderStatus.CONFIRMED)
+                .build();
 
-            return orderMapper.toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
 
-        } catch (Exception ex) {
-            throw new ProductServiceException("Insufficient stock for product id: " + request.getProductId());
-        }
+        return orderMapper.toResponse(saved);
+
     }
 
     @Override
@@ -59,5 +61,11 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(orderMapper::toResponse)
                 .toList();
+    }
+
+    private OrderResponse createOrderFallback(OrderRequest request,Exception ex){
+        throw new ProductServiceException(
+                "Product Service is currently unavailable. Please try again later."
+        );
     }
 }
