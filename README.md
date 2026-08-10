@@ -54,41 +54,91 @@ Implemented services include:
 The services communicate using **OpenFeign** while **RabbitMQ** provides asynchronous messaging and **Redis** improves performance through caching.
 
 ---
-# Eureka Dashboard
+# 🏗️ System Architecture
 
-All microservices are successfully registered with Eureka Service Discovery.
+The backend follows a **microservices architecture** where all requests enter through the API Gateway. Services register with Eureka, communicate using OpenFeign, cache data in Redis, publish events to RabbitMQ, and persist data in PostgreSQL.
 
-![Eureka Dashboard](docs/images/eureka-dashboard.png)
+<p align="center">
+  <img src="docs/images/architecture.png" alt="System Architecture" width="100%">
+</p>
 
-# Swagger API Documentation
+---
 
-Interactive API documentation generated using SpringDoc OpenAPI.
+# 🔄 Order Creation Sequence
 
-![Swagger](docs/images/swagger-product.png)
+The following diagram illustrates the complete lifecycle of an order, from the client request to inventory validation, order persistence, event publication, and asynchronous event consumption using RabbitMQ.
 
-# RabbitMQ
+<p align="center">
+  <img src="docs/images/order-sequence.png" alt="Order Sequence Diagram" width="100%">
+</p>
 
-RabbitMQ Management Dashboard showing the configured queue.
+---
 
-![RabbitMQ](docs/images/rabbitmq-dashboard.png)
+# 💾 Redis Cache Flow
 
-# Continuous Integration
+The Product Service uses **Redis** to cache product details. On a cache hit, the response is returned directly from Redis; on a cache miss, data is fetched from PostgreSQL, stored in Redis, and then returned to the client.
 
-GitHub Actions automatically builds every service and runs unit tests.
+<p align="center">
+  <img src="docs/images/redis-cache-flow.png" alt="Redis Cache Flow" width="100%">
+</p>
 
-![GitHub Actions](docs/images/github-actions.png)
+---
 
-# Redis Cache
+# 🛡️ Circuit Breaker Flow
 
-Cached product data stored in Redis.
+The Order Service uses **Resilience4j Circuit Breaker** to prevent cascading failures. When the Product Service becomes unavailable, the circuit transitions through **Closed**, **Open**, and **Half-Open** states before restoring normal traffic.
 
-![Redis](docs/images/redis-cache.png)
+<p align="center">
+  <img src="docs/images/circuit-breaker-flow.png" alt="Circuit Breaker Flow" width="100%">
+</p>
 
-# Docker Containers
+# 📸 Application Screenshots
 
-All microservices running using Docker Compose.
+## Eureka Dashboard
 
-![Docker](docs/images/docker-containers.png)
+<p align="center">
+  <img src="docs/images/eureka-dashboard.png" width="100%">
+</p>
+
+---
+
+## Swagger API Documentation
+
+<p align="center">
+  <img src="docs/images/swagger-product.png" width="100%">
+</p>
+
+---
+
+## RabbitMQ Dashboard
+
+<p align="center">
+  <img src="docs/images/rabbitmq-dashboard.png" width="100%">
+</p>
+
+---
+
+## Redis Cache
+
+<p align="center">
+  <img src="docs/images/redis-cache.png" width="100%">
+</p>
+
+---
+
+## Docker Containers
+
+<p align="center">
+  <img src="docs/images/docker-containers.png" width="100%">
+</p>
+
+---
+
+## GitHub Actions CI
+
+<p align="center">
+  <img src="docs/images/github-actions.png" width="100%">
+</p>
 
 # ✨ Features
 
