@@ -1,17 +1,18 @@
 package com.mishalp789.order_service.service;
 
 import com.mishalp789.order_service.client.ProductClient;
+import com.mishalp789.order_service.dto.OrderCreatedEvent;
 import com.mishalp789.order_service.dto.OrderRequest;
 import com.mishalp789.order_service.dto.OrderResponse;
 import com.mishalp789.order_service.dto.ProductResponse;
 import com.mishalp789.order_service.entity.Order;
 import com.mishalp789.order_service.entity.OrderStatus;
-import com.mishalp789.order_service.exception.ProductServiceException;
 import com.mishalp789.order_service.mapper.OrderMapper;
 import com.mishalp789.order_service.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,6 +31,9 @@ public class OrderServiceImplTest {
     private ProductClient productClient;
     @Mock
     private OrderMapper orderMapper;
+
+    @Mock
+    private OrderEventPublisher publisher;
 
     @InjectMocks
     private OrderServiceImpl service;
@@ -96,6 +100,18 @@ public class OrderServiceImplTest {
         verify(productClient).decreaseStock(1L, 2);
         verify(orderRepository).save(any(Order.class));
         verify(orderMapper).toResponse(order);
+
+        ArgumentCaptor<OrderCreatedEvent> captor =
+                ArgumentCaptor.forClass(OrderCreatedEvent.class);
+
+        verify(publisher).publish(captor.capture());
+
+        OrderCreatedEvent event = captor.getValue();
+
+        assertEquals(1L, event.getOrderId());
+        assertEquals(1L, event.getProductId());
+        assertEquals(2, event.getQuantity());
+        assertEquals(BigDecimal.valueOf(240000), event.getTotalPrice());
     }
 
     @Test
@@ -112,7 +128,18 @@ public class OrderServiceImplTest {
         assertEquals("Service unavailable", exception.getMessage());
 
         verify(productClient).getProduct(1L);
-        verify(orderRepository, never()).save(any());
+
+        verify(productClient, never())
+                .decreaseStock(anyLong(), anyInt());
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+
+        verify(orderMapper, never())
+                .toResponse(any(Order.class));
+
+        verify(publisher, never())
+                .publish(any(OrderCreatedEvent.class));
     }
 
     @Test
@@ -133,7 +160,15 @@ public class OrderServiceImplTest {
 
         verify(productClient).getProduct(1L);
         verify(productClient).decreaseStock(1L, 2);
-        verify(orderRepository, never()).save(any());
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+
+        verify(orderMapper, never())
+                .toResponse(any(Order.class));
+
+        verify(publisher, never())
+                .publish(any(OrderCreatedEvent.class));
     }
 
     @Test
@@ -166,10 +201,20 @@ public class OrderServiceImplTest {
 
         List<OrderResponse> result = service.getAllOrders();
 
+        assertNotNull(result);
         assertEquals(2, result.size());
+
         assertEquals(1L, result.get(0).getProductId());
+        assertEquals(2L, result.get(1).getProductId());
+
+        assertEquals(BigDecimal.valueOf(240000), result.get(0).getTotalPrice());
+        assertEquals(BigDecimal.valueOf(50000), result.get(1).getTotalPrice());
 
         verify(orderRepository).findAll();
+        verify(orderMapper, times(2)).toResponse(any(Order.class));
+
+        verifyNoInteractions(productClient);
+        verifyNoInteractions(publisher);
     }
 
 

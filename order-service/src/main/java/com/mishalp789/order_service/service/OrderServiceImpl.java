@@ -1,6 +1,7 @@
 package com.mishalp789.order_service.service;
 
 import com.mishalp789.order_service.client.ProductClient;
+import com.mishalp789.order_service.dto.OrderCreatedEvent;
 import com.mishalp789.order_service.dto.OrderRequest;
 import com.mishalp789.order_service.dto.OrderResponse;
 import com.mishalp789.order_service.dto.ProductResponse;
@@ -23,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
     private final OrderMapper orderMapper;
+    private final OrderEventPublisher publisher;
 
     @CircuitBreaker(
             name = "productService",
@@ -50,6 +52,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         Order saved = orderRepository.save(order);
+
+        publisher.publish(OrderCreatedEvent.builder()
+                        .orderId(saved.getId())
+                        .productId(saved.getProductId())
+                        .quantity(saved.getQuantity())
+                        .totalPrice(saved.getTotalPrice())
+                        .build()
+        );
 
         return orderMapper.toResponse(saved);
 
