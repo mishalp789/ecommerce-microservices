@@ -21,12 +21,13 @@ public class GlobalExceptionHandler {
 
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Product Service Error")
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .error("Product Service Unavailable")
                 .message(ex.getMessage())
                 .build();
 
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
