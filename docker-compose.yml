@@ -46,6 +46,7 @@ services:
     depends_on:
       - postgres
       - eureka-server
+      - redis
 
   auth-service:
     build: ./auth-service
