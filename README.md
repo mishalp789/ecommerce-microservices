@@ -54,6 +54,41 @@ Implemented services include:
 The services communicate using **OpenFeign** while **RabbitMQ** provides asynchronous messaging and **Redis** improves performance through caching.
 
 ---
+# Eureka Dashboard
+
+All microservices are successfully registered with Eureka Service Discovery.
+
+![Eureka Dashboard](docs/images/eureka-dashboard.png)
+
+# Swagger API Documentation
+
+Interactive API documentation generated using SpringDoc OpenAPI.
+
+![Swagger](docs/images/swagger-product.png)
+
+# RabbitMQ
+
+RabbitMQ Management Dashboard showing the configured queue.
+
+![RabbitMQ](docs/images/rabbitmq-dashboard.png)
+
+# Continuous Integration
+
+GitHub Actions automatically builds every service and runs unit tests.
+
+![GitHub Actions](docs/images/github-actions.png)
+
+# Redis Cache
+
+Cached product data stored in Redis.
+
+![Redis](docs/images/redis-cache.png)
+
+# Docker Containers
+
+All microservices running using Docker Compose.
+
+![Docker](docs/images/docker-containers.png)
 
 # ✨ Features
 
