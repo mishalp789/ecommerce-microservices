@@ -9,6 +9,9 @@ import com.mishalp789.product_service.mapper.ProductMapper;
 import com.mishalp789.product_service.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +32,7 @@ public class ProductServiceImpl implements ProductService{
                 .toList();
     }
 
+    @Cacheable(value = "products", key = "#id")
     @Override
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
@@ -45,9 +49,11 @@ public class ProductServiceImpl implements ProductService{
         return productMapper.toResponse(saved);
     }
 
+    @CachePut(value = "products", key = "#id")
     @Transactional
     @Override
-    public ProductResponse updateProduct(Long id, ProductRequest request) {
+    public ProductResponse updateProduct(Long id,
+                                         ProductRequest request) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(()-> new ProductNotFoundException(id));
 
@@ -58,7 +64,7 @@ public class ProductServiceImpl implements ProductService{
 
 
     }
-
+    @CacheEvict(value = "products", key = "#id")
     @Transactional
     @Override
     public String deleteProduct(Long id) {
