@@ -377,24 +377,30 @@ Fallback Method
 ecommerce-microservices
 │
 ├── api-gateway
-│
 ├── auth-service
-│
 ├── product-service
-│
 ├── order-service
-│
 ├── eureka-server
 │
+├── docs
+│   └── images
+│       ├── architecture.png
+│       ├── order-sequence.png
+│       ├── redis-cache-flow.png
+│       ├── circuit-breaker-flow.png
+│       ├── eureka-dashboard.png
+│       ├── swagger-product.png
+│       ├── rabbitmq-dashboard.png
+│       ├── redis-cache.png
+│       ├── docker-containers.png
+│       └── github-actions.png
+│
 ├── docker-compose.yml
-│
 ├── init.sql
-│
-├── .github
-│   └── workflows
-│       └── ci.yml
-│
-└── README.md
+├── README.md
+└── .github
+    └── workflows
+        └── ci.yml
 ```
 
 ---
